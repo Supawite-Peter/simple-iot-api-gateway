@@ -6,7 +6,7 @@ A api gateway for simple iot backend project.
 
 ## Planning Features
 
-- :black_square_button: Dockerize
+- :white_check_mark: Dockerize
 - :black_square_button: JWT Cookie
 - :black_square_button: Swagger UI Page
 - :black_square_button: e2e Test
