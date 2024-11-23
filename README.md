@@ -1,36 +1,22 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+# Simple IoT Backend - API Gateway
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+A api gateway for simple iot backend project.
+
+## Requirements
+
+1. Node.js (version >= 16)
 
 ## Project setup
 
-```bash
-$ npm install
-```
+1. Clone this project and install node.js packages
+
+    ```bash
+    $ npm install
+    ```
+
+2. Update environment variables in `.env.development.local` (Dev) or `.env` (Prod)
 
 ## Compile and run the project
 
@@ -45,41 +31,593 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+The application should be serving on port `3000`. (Default)
+
 ## Run tests
 
 ```bash
 # unit tests
 $ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
 ```
 
-## Resources
+## API
 
-Check out a few resources that may come in handy when working with NestJS:
+### Users
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+#### Add or Remove User Account
 
-## Support
+<details>
+ <summary><code>POST</code> <code><b>/users</b></code> <code>(Register new user account)</code></summary>
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+##### Authentication
 
-## Stay in touch
+> None
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+##### Parameters
 
-## License
+> None
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+##### Body
+
+> | name | type | data type | description |
+> |------|------|-----------|-------------|
+> | username   | required | string | string of username  |
+> | password   | required | string | string of password  |
+
+
+##### Responses
+
+> | http code | content-type | response |
+> |-----------|--------------|----------|
+> | `201` | `application/json` | `{"id": 1 ,"username": hello}` |
+> | `400` | `application/json` | `{"message": "Validation failed","statusCode": 400}` |
+> | `409` | `application/json` | `{"message": "Username already exists","error": "Conflict","statusCode": 409}` |
+
+##### Example cURL
+
+> ```javascript
+> curl --location 'http://localhost:3000/users' \
+> --header 'Content-Type: application/json' \
+> --data '{
+>    "username": "hello",
+>    "password": "world"
+> }'
+> ```
+
+</details>
+
+<details>
+ <summary><code>DELETE</code> <code><b>/users</b></code> <code>(Delete user account)</code></summary>
+
+##### Authentication
+
+> | header | type | description |      
+> |--------|------|-------------|
+> | Authorization   | Bearer {{JWT_TOKEN}} | Get from /auth/login |
+
+
+##### Parameters
+
+> None
+
+##### Body
+
+> | name      |  type     | data type               | description                                                           |
+> |-----------|-----------|-------------------------|-----------------------------------------------------------------------|
+> | password   | required | string | string of password
+
+
+##### Responses
+
+> | http code     | content-type                      | response                                                            |
+> |---------------|-----------------------------------|---------------------------------------------------------------------|
+> | `200`         | `application/json`        | `{"id": 1, "username": "hello"}`|
+> | `400`         | `application/json`                | `{"message": "Validation failed","statusCode": 400}`|
+> | `401`         | `application/json`         | `{"message": "Unauthorized","statusCode": 401}`|
+> | `404`         | `application/json`         | `{"message": "User does not exist","statusCode": 404}`|
+
+##### Example cURL
+
+> ```javascript
+> curl --location --request DELETE 'http://localhost:3000/users' \
+> --header 'Authorization: Bearer {{JWT_TOKEN}}' \
+> --header 'Content-Type: application/json' \
+> --data '{
+>    "password": "world"
+> }'
+> ```
+
+</details>
+
+---------------------------------------------------------
+
+### Auth
+
+#### Login
+
+<details>
+ <summary><code>POST</code> <code><b>/auth/login</b></code> <code>(Login and get JWT Token)</code></summary>
+
+##### Authentication
+
+> None
+
+##### Parameters
+
+> None
+
+##### Body
+
+> | name      |  type     | data type               | description                                                           |
+> |-----------|-----------|-------------------------|-----------------------------------------------------------------------|
+> | username   | required | string | string of username  |
+> | password   | required | string | string of password
+
+
+##### Responses
+
+> | http code | content-type | response |
+> |-----------|--------------|----------|
+> | `200`     | `application/json` | `{"accessToken": {{JWT_TOKEN}}}`|
+> | `400`     | `application/json` | `{"message": "Validation failed","statusCode": 400}`|
+> | `401`     | `application/json` | `{"message": "Incorrect password","statusCode": 401}`|
+> | `404`     | `application/json` | `{"message": "User doesn't exist","statusCode": 404}`|
+
+##### Example cURL
+
+> ```javascript
+> curl --location 'http://localhost:3000/auth/login' \
+> --header 'Content-Type: application/json' \
+> --data '{
+>    "username": "hello",
+>    "password": "world"
+> }'
+> ```
+
+</details>
+
+------------------------------------------------------
+
+### Devices
+
+#### Add or Remove Device
+
+<details>
+ <summary><code>POST</code> <code><b>/devices</b></code> <code>(Register new device to user)</code></summary>
+
+##### Authentication
+
+> | header | type | description |      
+> |--------|------|-------------|
+> | Authorization   | Bearer {{JWT_TOKEN}} | Get from /auth/login |
+
+##### Parameters
+
+> None
+
+##### Body
+
+> | name | type | data type | description |
+> |------|------|-----------|-------------|
+> | name   | required | string   | Name of the device  |
+> | topics | optional | string[] or string | Topics to be registered   |
+
+
+##### Responses
+
+> | http code | content-type | response |
+> |-----------|--------------|----------|
+> | `201` | `application/json` | `{"id": 1, "name": "device1", "userId": 1, "topics": ["temp", "rh"]}` |
+> | `400` | `application/json` | `{"message": "Validation failed","statusCode": 400}` |
+> | `400` | `application/json` | `{"message": "Device name is missing","statusCode": 400}` |
+> | `404` | `application/json` | `{"message": "User not found","statusCode": 404}` |
+
+##### Example cURL
+
+> ```javascript
+> curl --location 'http://localhost:3000/devices' \
+> --header 'Authorization: Bearer {{JWT_TOKEN}}' \
+> --header 'Content-Type: application/json' \
+> --data '{
+>    "name": "device1",
+>    "topics": ["temp","rh"]
+>}'
+> ```
+
+</details>
+
+<details>
+ <summary><code>DELETE</code> <code><b>/devices</b></code> <code>(Delete registered device)</code></summary>
+
+##### Authentication
+
+> | header      |  type    | description   |      
+> |-----------|-----------|-------------------------|
+> | Authorization   | Bearer {{JWT_TOKEN}} | Get from /auth/login
+
+
+##### Parameters
+
+> None
+
+##### Body
+
+> | name      |  type     | data type               | description                                                           |
+> |-----------|-----------|-------------------------|-----------------------------------------------------------------------|
+> | id  | required | string or number | device id to be delete |
+
+
+##### Responses
+
+> | http code     | content-type                      | response                                                            |
+> |---------------|-----------------------------------|---------------------------------------------------------------------|
+> | `200`         | `application/json`        | `{"id": 1, "name": "device2", "userId": 1, "topics": ["temp", "rh"]}`|
+> | `400`         | `application/json`         | `{"message": "Validation failed","statusCode": 400}`|
+> | `401`         | `application/json`         | `{"message": "Unauthorized","statusCode": 401}`|
+> | `404`         | `application/json`         | `{"message": "Device with id {{deviceId}} was not found for user with id {{userId}}","statusCode": 404}`|
+> | `404`         | `application/json`         | `{"message": "User not found","statusCode": 404}`|
+
+##### Example cURL
+
+> ```javascript
+> curl --location --request DELETE 'http://localhost:3000/devices' \
+> --header 'Authorization: Bearer {{JWT_TOKEN}}' \
+> --header 'Content-Type: application/json' \
+> --data '{
+>    "id": "1"
+> }'
+> ```
+
+</details>
+
+--------------------------------------------------------------------
+
+#### Add or Remove Topics
+
+<details>
+ <summary><code>POST</code> <code><b>/devices/{deviceId}/topics</b></code> <code>(Add new topics to a device)</code></summary>
+
+##### Authentication
+
+> | header | type | description |      
+> |--------|------|-------------|
+> | Authorization   | Bearer {{JWT_TOKEN}} | Get from /auth/login |
+
+##### Parameters
+
+> | name | type | data type | description |
+> |------|------|-----------|-------------|
+> | `deviceId` | required | number | target device id to add topics |
+
+##### Body
+
+> | name | type | data type | description |
+> |------|------|-----------|-------------|
+> | topics   | required | string[] or string   | topics to be added |
+
+
+##### Responses
+
+> | http code | content-type | response |
+> |-----------|--------------|----------|
+> | `201` | `application/json` | `{"topicsAdded": 1, "topics": ["air"]}` |
+> | `400`         | `application/json`                | `{"message": "Validation failed","statusCode": 400}`|
+> | `400`         | `application/json`         | `{"message": "Topics are already registered","statusCode": 400}`|
+> | `401`         | `application/json`         | `{"message": "Unauthorized","statusCode": 401}`|
+> | `404`         | `application/json`         | `{"message": "Device with id {{deviceId}} was not found for user with id {{userId}}","statusCode": 404}`|
+> | `404`         | `application/json`         | `{"message": "User not found","statusCode": 404}`|
+
+##### Example cURL
+
+> ```javascript
+> curl --location 'http://localhost:3000/devices/1/topics' \
+> --header 'Authorization: Bearer {{JWT_TOKEN}}' \
+> --header 'Content-Type: application/json' \
+> --data '{
+>    "topics": "air"
+>}'
+> ```
+
+</details>
+
+<details>
+ <summary><code>DELETE</code> <code><b>/devices/{deviceId}/topics</b></code> <code>(Remove registered topic from a device)</code></summary>
+
+##### Authentication
+
+> | header      |  type    | description   |      
+> |-----------|-----------|-------------------------|
+> | Authorization   | Bearer {{JWT_TOKEN}} | Get from /auth/login
+
+
+##### Parameters
+
+> | name | type | data type | description |
+> |------|------|-----------|-------------|
+> | `deviceId` | required | number | target device id to delete topics |
+
+##### Body
+
+> | name      |  type     | data type               | description                                                           |
+> |-----------|-----------|-------------------------|-----------------------------------------------------------------------|
+> | topics  | required | string or string[] | topics to be removed |
+
+
+##### Responses
+
+> | http code | content-type | response |
+> |-----------|--------------|----------|
+> | `201` | `application/json` | `{"topicsRemoved": 1, "topics": ["air"]}` |
+> | `400`         | `application/json`                | `{"message": "Validation failed","statusCode": 400}`|
+> | `400`         | `application/json`         | `{"message": "Topics are not registered","statusCode": 400}`|
+> | `401`         | `application/json`         | `{"message": "Unauthorized","statusCode": 401}`|
+> | `404`         | `application/json`         | `{"message": "Device with id {{deviceId}} was not found for user with id {{userId}}","statusCode": 404}`|
+> | `404`         | `application/json`         | `{"message": "User not found","statusCode": 404}`|
+
+##### Example cURL
+
+> ```javascript
+> curl --location --request DELETE 'http://localhost:3000/devices/1/topics' \
+> --header 'Authorization: Bearer {{JWT_TOKEN}}' \
+> --header 'Content-Type: application/json' \
+> --data '{
+>    "topics": "air"
+> }'
+> ```
+
+</details>
+
+----------------------------------------------
+
+#### List User Owned Devices
+
+<details>
+ <summary><code>GET</code> <code><b>/devices</b></code> <code>(List every devices registered by current user)</code></summary>
+
+##### Authentication
+
+> | header      |  type    | description   |      
+> |-----------|-----------|-------------------------|
+> | Authorization   | Bearer {{JWT_TOKEN}} | Get from /auth/login
+
+
+##### Parameters
+
+> None
+
+##### Body
+
+> None
+
+
+##### Responses
+
+> | http code | content-type | response |
+> |-----------|--------------|----------|
+> | `200` | `application/json` | `[{"id": 1, "name": "device1", "userId": 1,  "topics": ["temp", "rh"]}]` |
+> | `401`         | `application/json`         | `{"message": "Unauthorized","statusCode": 401}`|
+> | `404`         | `application/json`         | `{"message": "No devices found","statusCode": 404}`|
+
+##### Example cURL
+
+> ```javascript
+> curl --location 'http://localhost:3000/devices' \
+> --header 'Authorization: Bearer {{JWT_TOKEN}}'
+> ```
+
+</details>
+
+
+----------------------------------------------
+
+#### Sending Sensor Data to a Topic
+
+<details>
+ <summary><code>POST</code> <code><b>/devices/{deviceId}/{topic}</b></code> <code>(Sending Sensor Data to a Topic)</code></summary>
+
+##### Authentication
+
+> | header | type | description |      
+> |--------|------|-------------|
+> | Authorization   | Bearer {{JWT_TOKEN}} | Get from /auth/login |
+
+##### Parameters
+
+> | name | type | data type | description |
+> |------|------|-----------|-------------|
+> | `deviceId` | required | number | target device id to storing data |
+> | `topic` | required | string | target topic to storing data |
+
+##### Body
+
+> | name | type | data type | description |
+> |------|------|-----------|-------------|
+> | payload | required | object or object[] | `{timestamp: {{iso_timestamp}}, value: {{number}}}` |
+
+
+##### Responses
+
+> | http code | content-type | response |
+> |-----------|--------------|----------|
+> | `201` | `application/json` | `[{"timestamp": {{iso_timestamp}},"metadata":{"topic":{{topic}},"device_id":{{device_id}}},"value":{{number}}}, ...]` |
+> | `400`         | `application/json`                | `{"message": "Validation failed","statusCode": 400}`|
+> | `401`         | `application/json`         | `{"message": "Unauthorized","statusCode": 401}`|
+> | `401`         | `application/json`         | `{"message": "Requester is not the owner of the device","statusCode": 401}`|
+> | `404`         | `application/json`         | `{"message": "Device with id {{device_id}} was not found","statusCode": 404}`|
+> | `404`         | `application/json`         | `{"message": "User not found","statusCode": 404}`|
+
+##### Example cURL
+
+> ```javascript
+> curl --location 'http://localhost:3000/devices/1/temp' \
+> --header 'Authorization: Bearer {{JWT_TOKEN}}' \
+> --header 'Content-Type: application/json' \
+> --data '{
+>   "payload": [
+>        {
+>            "value": 0
+>        },
+>        {
+>            "timestamp": "2024-10-18T08:54:50.318Z",
+>            "value" : 3
+>        }
+>    ]
+>}'
+> ```
+
+#### Example Response
+
+>```javascript
+>[
+>    {
+>        "timestamp": "2024-10-18T10:57:26.776Z",
+>        "metadata": {
+>            "topic": "temp",
+>            "device_id": 5
+>        },
+>        "value": 0
+>    },
+>    {
+>        "timestamp": "2024-10-18T10:54:05.904Z",
+>        "metadata": {
+>            "topic": "temp",
+>            "device_id": 5
+>        },
+>        "value": 3
+>    }
+>]
+>```
+
+</details>
+
+----------------------------------------------
+
+#### Query Sensor Data
+
+<details>
+ <summary><code>GET</code> <code><b>/devices/{deviceId}/{topic}/latest</b></code> <code>(Query latest data from a topic)</code></summary>
+
+##### Authentication
+
+> | header | type | description |      
+> |--------|------|-------------|
+> | Authorization   | Bearer {{JWT_TOKEN}} | Get from /auth/login |
+
+##### Parameters
+
+> | name | type | data type | description |
+> |------|------|-----------|-------------|
+> | `deviceId` | required | number | target device id to storing data |
+> | `topic` | required | string | target topic to storing data |
+
+##### Body
+
+> None
+
+
+##### Responses
+
+> | http code | content-type | response |
+> |-----------|--------------|----------|
+> | `200` | `application/json` | `{{"timestamp": {{iso_timestamp}},"metadata":{"topic":{{topic}},"device_id":{{device_id}}},"value":{{number}}}}` |
+> | `401`         | `application/json`         | `{"message": "Unauthorized","statusCode": 401}`|
+> | `401`         | `application/json`         | `{"message": "Requester is not the owner of the device","statusCode": 401}`|
+> | `404`         | `application/json`         | `{"message": "Device with id {{device_id}} was not found","statusCode": 404}`|
+> | `404`         | `application/json`         | `{"message": "User not found","statusCode": 404}`|
+> | `404`         | `application/json`         | `{"message": "No Latest Data Found","statusCode": 404}`|
+
+##### Example cURL
+
+> ```javascript
+> curl --location 'http://localhost:3000/devices/1/temp/latest' \
+> --header 'Authorization: Bearer {{JWT_TOKEN}}'
+> ```
+
+#### Example Response
+
+>```javascript
+>{
+>    "metadata": {
+>        "device_id": 5,
+>        "topic": "temp"
+>    },
+>    "timestamp": "2024-10-18T10:57:26.776Z",
+>    "value": 0
+>}
+>```
+
+</details>
+
+<details>
+ <summary><code>GET</code> <code><b>/devices/{deviceId}/{topic}/periodic</b></code> <code>(Query sensor data in between time)</code></summary>
+
+##### Authentication
+
+> | header | type | description |      
+> |--------|------|-------------|
+> | Authorization   | Bearer {{JWT_TOKEN}} | Get from /auth/login |
+
+##### Parameters
+
+> | name | type | data type | description |
+> |------|------|-----------|-------------|
+> | `deviceId` | required | number | target device id to storing data |
+> | `topic` | required | string | target topic to storing data |
+
+##### Body
+
+> | name | type | data type | description |
+> |------|------|-----------|-------------|
+> | from | required | ISO String Datetime | datetime indicating the starting point of requested data |
+> | to   | required | ISO String Datetime |  datetime indicating the end of requested data |
+
+
+##### Responses
+
+> | http code | content-type | response |
+> |-----------|--------------|----------|
+> | `200` | `application/json` | `[{{"timestamp": {{iso_timestamp}},"metadata":{"topic":{{topic}},"device_id":{{device_id}}},"value":{{number}}}, ...]}` |
+> | `401`         | `application/json`         | `{"message": "Unauthorized","statusCode": 401}`|
+> | `401`         | `application/json`         | `{"message": "Requester is not the owner of the device","statusCode": 401}`|
+> | `404`         | `application/json`         | `{"message": "Device with id {{device_id}} was not found","statusCode": 404}`|
+> | `404`         | `application/json`         | `{"message": "User not found","statusCode": 404}`|
+> | `404`         | `application/json`         | `{"message": "No Data Found From The Given Period","statusCode": 404}`|
+
+##### Example cURL
+
+> ```javascript
+> curl --location 'http://localhost:3000/devices/1/temp/periodic' \
+> --header 'Authorization: Bearer {{JWT_TOKEN}}' \
+> --header 'Content-Type: application/json' \
+> --data '{
+>    "from": "2024-10-18T11:03:28.273Z",
+>    "to": "2024-10-18T11:05:28.273Z"
+>}'
+> ```
+
+#### Example Response
+
+>```javascript
+>[
+>    {
+>        "metadata": {
+>            "device_id": 5,
+>            "topic": "temp"
+>        },
+>        "timestamp": "2024-10-18T11:05:25.896Z",
+>        "value": 1
+>    },
+>    {
+>        "metadata": {
+>            "device_id": 5,
+>            "topic": "temp"
+>        },
+>        "timestamp": "2024-10-18T11:05:25.062Z",
+>        "value": 1
+>    }
+>]
+>```
+
+</details>
+
+----------------------------------------------
