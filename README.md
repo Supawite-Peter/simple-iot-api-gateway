@@ -47,6 +47,12 @@ The application should be serving on port `3000`. (Default)
 $ npm run test
 ```
 
+## Docker
+
+```bash
+docker build -t simple-iot-api-gateway:{tag} .
+```
+
 ## API
 
 ### Users
