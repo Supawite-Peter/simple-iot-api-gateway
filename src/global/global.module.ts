@@ -1,6 +1,8 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Transport, ClientsModule } from '@nestjs/microservices';
+import { CacheModule, CacheStore } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-yet';
 
 const ENV = process.env.NODE_ENV;
 
@@ -56,7 +58,24 @@ const ENV = process.env.NODE_ENV;
         }),
       },
     ]),
+    CacheModule.registerAsync({
+      useFactory: async () => {
+        const store = await redisStore({
+          socket: {
+            host: process.env.REDIS_HOST,
+            port: parseInt(process.env.REDIS_PORT),
+          },
+          password: process.env.REDIS_PASSWORD || undefined,
+        });
+
+        return {
+          store: store as unknown as CacheStore,
+          ttl: parseInt(process.env.REDIS_CACHE_TTL) * 60000, // minutes (milliseconds)
+          isGlobal: true,
+        };
+      },
+    }),
   ],
-  exports: [ClientsModule],
+  exports: [ClientsModule, CacheModule],
 })
 export class GlobalClientsModule {}
