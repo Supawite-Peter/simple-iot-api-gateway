@@ -7,6 +7,7 @@ A api gateway for simple iot backend project.
 ## Planning Features
 
 - :white_check_mark: Dockerize
+- :white_check_mark: Cache
 - :black_square_button: JWT Cookie
 - :black_square_button: Swagger UI Page
 - :black_square_button: e2e Test
@@ -14,6 +15,7 @@ A api gateway for simple iot backend project.
 ## Requirements
 
 1. Node.js (version >= 16)
+2. Redis (For caching)
 
 ## Project setup
 

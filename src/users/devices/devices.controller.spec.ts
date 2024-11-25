@@ -2,12 +2,19 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DevicesController } from './devices.controller';
 import { DevicesService } from './devices.service';
 import { DevicesServiceMock } from './mocks/devices.service.mock';
+import { CacheMock } from '../../mocks/cache.mock';
+import { Cache } from 'cache-manager';
+import { GET_DEVICES_LIST_CACHE_PREFIX } from './caches/cache.prefix';
 
 describe('DevicesController', () => {
   let controller: DevicesController;
   let service: DevicesService;
+  let cache: Cache;
+  let cacheMock: CacheMock;
 
   beforeEach(async () => {
+    cacheMock = new CacheMock();
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [DevicesController],
     })
@@ -15,17 +22,21 @@ describe('DevicesController', () => {
         switch (token) {
           case DevicesService:
             return DevicesServiceMock.build();
+          case 'CACHE_MANAGER':
+            return cacheMock.build();
         }
       })
       .compile();
 
     controller = module.get(DevicesController);
     service = module.get(DevicesService);
+    cache = module.get('CACHE_MANAGER');
   });
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
     expect(service).toBeDefined();
+    expect(cache).toBeDefined();
   });
 
   describe('[POST] /devices', () => {
@@ -47,6 +58,31 @@ describe('DevicesController', () => {
       ).toEqual('register Received');
       expect(service.register).toHaveBeenCalledTimes(1);
     });
+
+    it('should refresh cache for get devices list', async () => {
+      // Arrage
+      const userId = 1;
+      const cacheKey = `${GET_DEVICES_LIST_CACHE_PREFIX}/${userId}`;
+      cacheMock.set(cacheKey, 'Devices list from cache');
+
+      // Act & Assert
+      expect(
+        await controller.register(
+          {
+            user: {
+              username: 'user1',
+              sub: userId,
+            },
+          },
+          {
+            name: 'device1',
+            topics: ['topic1'],
+          },
+        ),
+      ).toEqual('register Received');
+      expect(service.register).toHaveBeenCalledTimes(1);
+      expect(await cacheMock.get(cacheKey)).toEqual(undefined);
+    });
   });
 
   describe('[DELETE] /devices', () => {
@@ -65,6 +101,28 @@ describe('DevicesController', () => {
       ).toEqual('unregister Received');
       expect(service.unregister).toHaveBeenCalledTimes(1);
     });
+
+    it('should refresh cache for get devices list', async () => {
+      // Arrage
+      const userId = 1;
+      const cacheKey = `${GET_DEVICES_LIST_CACHE_PREFIX}/${userId}`;
+      cacheMock.set(cacheKey, 'Devices list from cache');
+
+      // Act & Assert
+      expect(
+        await controller.unregister(
+          {
+            user: {
+              username: 'user1',
+              sub: userId,
+            },
+          },
+          1,
+        ),
+      ).toEqual('unregister Received');
+      expect(service.unregister).toHaveBeenCalledTimes(1);
+      expect(await cacheMock.get(cacheKey)).toEqual(undefined);
+    });
   });
 
   describe('[GET] /devices', () => {
@@ -79,6 +137,24 @@ describe('DevicesController', () => {
         }),
       ).toEqual('getDevicesList Received');
       expect(service.getDevicesList).toHaveBeenCalledTimes(1);
+    });
+
+    it('should get devices list from cache if exists', async () => {
+      // Arrage
+      const userId = 1;
+      const cacheKey = `${GET_DEVICES_LIST_CACHE_PREFIX}/${userId}`;
+      cacheMock.set(cacheKey, 'Devices list from cache');
+
+      // Act & Assert
+      expect(
+        await controller.list({
+          user: {
+            username: 'user1',
+            sub: userId,
+          },
+        }),
+      ).toEqual('Devices list from cache');
+      expect(service.getDevicesList).toHaveBeenCalledTimes(0);
     });
   });
 
@@ -99,6 +175,29 @@ describe('DevicesController', () => {
       ).toEqual('addDeviceTopics Received');
       expect(service.addDeviceTopics).toHaveBeenCalledTimes(1);
     });
+
+    it('should refresh cache for get devices list', async () => {
+      // Arrage
+      const userId = 1;
+      const cacheKey = `${GET_DEVICES_LIST_CACHE_PREFIX}/${userId}`;
+      cacheMock.set(cacheKey, 'Devices list from cache');
+
+      // Act & Assert
+      expect(
+        await controller.addTopic(
+          {
+            user: {
+              username: 'user1',
+              sub: userId,
+            },
+          },
+          ['topic1'],
+          1,
+        ),
+      ).toEqual('addDeviceTopics Received');
+      expect(service.addDeviceTopics).toHaveBeenCalledTimes(1);
+      expect(await cacheMock.get(cacheKey)).toEqual(undefined);
+    });
   });
 
   describe('[DELETE] /devices/:deviceId/topics', () => {
@@ -117,6 +216,29 @@ describe('DevicesController', () => {
         ),
       ).toEqual('removeDeviceTopics Received');
       expect(service.removeDeviceTopics).toHaveBeenCalledTimes(1);
+    });
+
+    it('should refresh cache for get devices list', async () => {
+      // Arrage
+      const userId = 1;
+      const cacheKey = `${GET_DEVICES_LIST_CACHE_PREFIX}/${userId}`;
+      cacheMock.set(cacheKey, 'Devices list from cache');
+
+      // Act & Assert
+      expect(
+        await controller.removeTopic(
+          {
+            user: {
+              username: 'user1',
+              sub: userId,
+            },
+          },
+          ['topic1'],
+          1,
+        ),
+      ).toEqual('removeDeviceTopics Received');
+      expect(service.removeDeviceTopics).toHaveBeenCalledTimes(1);
+      expect(await cacheMock.get(cacheKey)).toEqual(undefined);
     });
   });
 });
