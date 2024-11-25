@@ -6,7 +6,10 @@ import {
   Body,
   Param,
   ParseIntPipe,
+  Inject,
 } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { SensorsDataService } from './sensors.data.service';
 import { SensorsDataDto, sensorsDataSchema } from './dto/data.dto';
 import {
@@ -14,10 +17,17 @@ import {
   sensorsDataPeriodicSchema,
 } from './dto/data.periodic.dto';
 import { ZodValidationPipe } from '../zod.validation.pipe';
+import {
+  GET_LATEST_DATA_CACHE_PREFIX,
+  GET_PERIODIC_DATA_CACHE_PREFIX,
+} from './caches/cache.prefix';
 
 @Controller('devices')
 export class SensorsDataController {
-  constructor(private sensorsDataService: SensorsDataService) {}
+  constructor(
+    private sensorsDataService: SensorsDataService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   @Post(':deviceId/:topic')
   updateValue(
@@ -27,6 +37,9 @@ export class SensorsDataController {
     @Param('deviceId', ParseIntPipe) deviceId: number,
     @Param('topic') topic: string,
   ) {
+    this.cacheManager.del(
+      `${GET_LATEST_DATA_CACHE_PREFIX}/${deviceId}/${topic}`,
+    );
     return this.sensorsDataService.updateValue(
       req.user.sub,
       deviceId,
@@ -36,16 +49,31 @@ export class SensorsDataController {
   }
 
   @Get(':deviceId/:topic/latest')
-  getLatestData(
+  async getLatestData(
     @Request() req,
     @Param('deviceId', ParseIntPipe) deviceId: number,
     @Param('topic') topic: string,
   ) {
-    return this.sensorsDataService.getLatestData(req.user.sub, deviceId, topic);
+    // Get from cache
+    const cacheKey = `${GET_LATEST_DATA_CACHE_PREFIX}/${deviceId}/${topic}`;
+    const cachedValue = await this.cacheManager.get(cacheKey);
+
+    // If cache exists, return
+    if (cachedValue) return cachedValue;
+
+    // Else, get latest data from service
+    const result = await this.sensorsDataService.getLatestData(
+      req.user.sub,
+      deviceId,
+      topic,
+    );
+    await this.cacheManager.set(cacheKey, result);
+
+    return result;
   }
 
   @Get(':deviceId/:topic/periodic')
-  getPeriodicData(
+  async getPeriodicData(
     @Request() req,
     @Body(new ZodValidationPipe(sensorsDataPeriodicSchema))
     devicesDataPeriodicDto: SensorsDataPeriodicDto,
@@ -53,12 +81,23 @@ export class SensorsDataController {
     deviceId: number,
     @Param('topic') topic: string,
   ) {
-    return this.sensorsDataService.getPeriodicData(
+    // Get from cache
+    const cacheKey = `${GET_PERIODIC_DATA_CACHE_PREFIX}/${deviceId}/${topic}/${devicesDataPeriodicDto.from}/${devicesDataPeriodicDto.to}`;
+    const cachedValue = await this.cacheManager.get(cacheKey);
+
+    // If cache exists, return
+    if (cachedValue) return cachedValue;
+
+    // Else, get latest data from service
+    const result = await this.sensorsDataService.getPeriodicData(
       req.user.sub,
       deviceId,
       topic,
       devicesDataPeriodicDto.from,
       devicesDataPeriodicDto.to,
     );
+    await this.cacheManager.set(cacheKey, result);
+
+    return result;
   }
 }
