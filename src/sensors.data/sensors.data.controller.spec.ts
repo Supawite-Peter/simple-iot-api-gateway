@@ -102,7 +102,7 @@ describe('SensorsDataController', () => {
   });
 
   describe('[GET] /devices/:deviceId/:topic/latest', () => {
-    it('should send data to service.getLatestData', async () => {
+    it('should send data to service.getLatestData (no unix)', async () => {
       // Act & Assert
       expect(
         await controller.getLatestData(
@@ -119,11 +119,29 @@ describe('SensorsDataController', () => {
       expect(service.getLatestData).toHaveBeenCalledTimes(1);
     });
 
-    it('should get latest data from cache if exists', async () => {
+    it('should send data to service.getLatestData (unix)', async () => {
+      // Act & Assert
+      expect(
+        await controller.getLatestData(
+          {
+            user: {
+              username: 'user1',
+              sub: 1,
+            },
+          },
+          1,
+          'topic1',
+          true,
+        ),
+      ).toEqual('getLatestData Received');
+      expect(service.getLatestData).toHaveBeenCalledTimes(1);
+    });
+
+    it('should get latest data from cache if exists (no unix)', async () => {
       // Arrage
       const deviceId = 1;
       const topic = 'topic1';
-      const cacheKey = `${GET_LATEST_DATA_CACHE_PREFIX}/${deviceId}/${topic}`;
+      const cacheKey = `${GET_LATEST_DATA_CACHE_PREFIX}/${deviceId}/${topic}/false`;
       cacheMock.set(cacheKey, 'Data from cache');
 
       // Act & Assert
@@ -141,10 +159,34 @@ describe('SensorsDataController', () => {
       ).toEqual('Data from cache');
       expect(service.getLatestData).toHaveBeenCalledTimes(0);
     });
+
+    it('should get latest data from cache if exists (no unix)', async () => {
+      // Arrage
+      const deviceId = 1;
+      const topic = 'topic1';
+      const cacheKey = `${GET_LATEST_DATA_CACHE_PREFIX}/${deviceId}/${topic}/true`;
+      cacheMock.set(cacheKey, 'Data from cache');
+
+      // Act & Assert
+      expect(
+        await controller.getLatestData(
+          {
+            user: {
+              username: 'user1',
+              sub: 1,
+            },
+          },
+          1,
+          'topic1',
+          true,
+        ),
+      ).toEqual('Data from cache');
+      expect(service.getLatestData).toHaveBeenCalledTimes(0);
+    });
   });
 
   describe('[GET] /devices/:deviceId/:topic/periodic', () => {
-    it('should send data to service.getPeriodicData', async () => {
+    it('should send data to service.getPeriodicData (no unix)', async () => {
       // Act & Assert
       expect(
         await controller.getPeriodicData(
@@ -165,13 +207,35 @@ describe('SensorsDataController', () => {
       expect(service.getPeriodicData).toHaveBeenCalledTimes(1);
     });
 
-    it('should get periodic data from cache if exists', async () => {
+    it('should send data to service.getPeriodicData (unix)', async () => {
+      // Act & Assert
+      expect(
+        await controller.getPeriodicData(
+          {
+            user: {
+              username: 'user1',
+              sub: 1,
+            },
+          },
+          {
+            from: new Date().toISOString(),
+            to: new Date().toDateString(),
+            unix: true,
+          },
+          1,
+          'topic1',
+        ),
+      ).toEqual('getPeriodicData Received');
+      expect(service.getPeriodicData).toHaveBeenCalledTimes(1);
+    });
+
+    it('should get periodic data from cache if exists (no unix)', async () => {
       // Arrage
       const deviceId = 1;
       const topic = 'topic1';
       const from = new Date().toISOString();
       const to = new Date().toDateString();
-      const cacheKey = `${GET_PERIODIC_DATA_CACHE_PREFIX}/${deviceId}/${topic}/${from}/${to}`;
+      const cacheKey = `${GET_PERIODIC_DATA_CACHE_PREFIX}/${deviceId}/${topic}/${from}/${to}/false`;
       cacheMock.set(cacheKey, 'Data from cache');
 
       // Act & Assert
@@ -186,6 +250,37 @@ describe('SensorsDataController', () => {
           {
             from: from,
             to: to,
+          },
+          deviceId,
+          topic,
+        ),
+      ).toEqual('Data from cache');
+      expect(service.getPeriodicData).toHaveBeenCalledTimes(0);
+    });
+
+    it('should get periodic data from cache if exists (unix)', async () => {
+      // Arrage
+      const deviceId = 1;
+      const topic = 'topic1';
+      const from = new Date().toISOString();
+      const to = new Date().toDateString();
+      const unix = true;
+      const cacheKey = `${GET_PERIODIC_DATA_CACHE_PREFIX}/${deviceId}/${topic}/${from}/${to}/${unix}`;
+      cacheMock.set(cacheKey, 'Data from cache');
+
+      // Act & Assert
+      expect(
+        await controller.getPeriodicData(
+          {
+            user: {
+              username: 'user1',
+              sub: 1,
+            },
+          },
+          {
+            from: from,
+            to: to,
+            unix: unix,
           },
           deviceId,
           topic,

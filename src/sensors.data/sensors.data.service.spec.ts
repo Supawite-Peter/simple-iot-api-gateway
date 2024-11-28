@@ -67,7 +67,7 @@ describe('SensorsDataService', () => {
   });
 
   describe('getLatestData', () => {
-    it('should send get latest data command to sensor data service', async () => {
+    it('should send get latest data command to sensor data service (no unix)', async () => {
       // Arrange
       const userId = 1;
       const deviceId = 1;
@@ -78,7 +78,23 @@ describe('SensorsDataService', () => {
         await service.getLatestData(userId, deviceId, deviceTopic),
       ).toEqual({
         pattern: { cmd: 'sensors.data.get.latest' },
-        payload: { userId, deviceId, deviceTopic },
+        payload: { userId, deviceId, deviceTopic, unix: false },
+      });
+    });
+
+    it('should send get latest data command to sensor data service (unix)', async () => {
+      // Arrange
+      const userId = 1;
+      const deviceId = 1;
+      const deviceTopic = 'temperature';
+      const unix = true;
+
+      // Act & Assert
+      expect(
+        await service.getLatestData(userId, deviceId, deviceTopic, unix),
+      ).toEqual({
+        pattern: { cmd: 'sensors.data.get.latest' },
+        payload: { userId, deviceId, deviceTopic, unix },
       });
     });
 
@@ -98,7 +114,7 @@ describe('SensorsDataService', () => {
   });
 
   describe('getPeriodicData', () => {
-    it('should send get periodic data command to sensor data service', async () => {
+    it('should send get periodic data command to sensor data service (no unix)', async () => {
       // Arrange
       const userId = 1;
       const deviceId = 1;
@@ -111,7 +127,32 @@ describe('SensorsDataService', () => {
         await service.getPeriodicData(userId, deviceId, deviceTopic, from, to),
       ).toEqual({
         pattern: { cmd: 'sensors.data.get.periodic' },
-        payload: { userId, deviceId, deviceTopic, from, to },
+        payload: { userId, deviceId, deviceTopic, from, to, unix: false },
+      });
+    });
+
+    it('should send get periodic data command to sensor data service (unix)', async () => {
+      // Arrange
+      const userId = 1;
+      const deviceId = 1;
+      const deviceTopic = 'temperature';
+      const from = new Date(Date.now() - 10000).toISOString();
+      const to = new Date().toISOString();
+      const unix = true;
+
+      // Act & Assert
+      expect(
+        await service.getPeriodicData(
+          userId,
+          deviceId,
+          deviceTopic,
+          from,
+          to,
+          unix,
+        ),
+      ).toEqual({
+        pattern: { cmd: 'sensors.data.get.periodic' },
+        payload: { userId, deviceId, deviceTopic, from, to, unix },
       });
     });
 
