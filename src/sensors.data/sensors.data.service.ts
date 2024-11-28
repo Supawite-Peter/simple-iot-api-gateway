@@ -22,9 +22,14 @@ export class SensorsDataService {
     );
   }
 
-  async getLatestData(userId: number, deviceId: number, deviceTopic: string) {
+  async getLatestData(
+    userId: number,
+    deviceId: number,
+    deviceTopic: string,
+    unix: boolean = false,
+  ) {
     const pattern = { cmd: 'sensors.data.get.latest' };
-    const payload = { userId, deviceId, deviceTopic };
+    const payload = { userId, deviceId, deviceTopic, unix };
     return firstValueFrom(
       this.client
         .send(pattern, payload)
@@ -36,11 +41,12 @@ export class SensorsDataService {
     userId: number,
     deviceId: number,
     deviceTopic: string,
-    from: string,
-    to: string,
+    from: string | number,
+    to: string | number,
+    unix: boolean = false,
   ) {
     const pattern = { cmd: 'sensors.data.get.periodic' };
-    const payload = { userId, deviceId, deviceTopic, from, to };
+    const payload = { userId, deviceId, deviceTopic, from, to, unix };
     return firstValueFrom(
       this.client
         .send(pattern, payload)
