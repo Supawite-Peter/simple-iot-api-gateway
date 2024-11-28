@@ -1,7 +1,14 @@
 import { z } from 'zod';
 
 const payloadDataSchema = z.object({
-  timestamp: z.string().datetime().optional(),
+  timestamp: z
+    .union([
+      z.string().datetime({ message: 'Invalid datetime format' }),
+      z.coerce
+        .number()
+        .positive({ message: 'Timestamp must be greater than 0' }),
+    ])
+    .optional(),
   value: z.number(),
 });
 export const sensorsDataSchema = z.object({
