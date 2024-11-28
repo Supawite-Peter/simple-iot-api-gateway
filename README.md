@@ -486,18 +486,10 @@ docker build -t simple-iot-api-gateway:{tag} .
 >[
 >    {
 >        "timestamp": "2024-10-18T10:57:26.776Z",
->        "metadata": {
->            "topic": "temp",
->            "device_id": 5
->        },
 >        "value": 0
 >    },
 >    {
 >        "timestamp": "2024-10-18T10:54:05.904Z",
->        "metadata": {
->            "topic": "temp",
->            "device_id": 5
->        },
 >        "value": 3
 >    }
 >]
@@ -558,10 +550,6 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 >```javascript
 >{
->    "metadata": {
->        "device_id": 5,
->        "topic": "temp"
->    },
 >    "timestamp": "2024-10-18T10:57:26.776Z",
 >    "value": 0
 >}
@@ -627,18 +615,10 @@ docker build -t simple-iot-api-gateway:{tag} .
 >```javascript
 >[
 >    {
->        "metadata": {
->            "device_id": 5,
->            "topic": "temp"
->        },
 >        "timestamp": "2024-10-18T11:05:25.896Z",
 >        "value": 1
 >    },
 >    {
->        "metadata": {
->            "device_id": 5,
->            "topic": "temp"
->        },
 >        "timestamp": "2024-10-18T11:05:25.062Z",
 >        "value": 1
 >    }
