@@ -7,6 +7,7 @@ import {
   Param,
   ParseIntPipe,
   Inject,
+  Query,
 } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
@@ -75,14 +76,14 @@ export class SensorsDataController {
   @Get(':deviceId/:topic/periodic')
   async getPeriodicData(
     @Request() req,
-    @Body(new ZodValidationPipe(sensorsDataPeriodicSchema))
-    devicesDataPeriodicDto: SensorsDataPeriodicDto,
+    @Query(new ZodValidationPipe(sensorsDataPeriodicSchema))
+    queryDevicesDataPeriodicDto: SensorsDataPeriodicDto,
     @Param('deviceId', ParseIntPipe)
     deviceId: number,
     @Param('topic') topic: string,
   ) {
     // Get from cache
-    const cacheKey = `${GET_PERIODIC_DATA_CACHE_PREFIX}/${deviceId}/${topic}/${devicesDataPeriodicDto.from}/${devicesDataPeriodicDto.to}`;
+    const cacheKey = `${GET_PERIODIC_DATA_CACHE_PREFIX}/${deviceId}/${topic}/${queryDevicesDataPeriodicDto.from}/${queryDevicesDataPeriodicDto.to}`;
     const cachedValue = await this.cacheManager.get(cacheKey);
 
     // If cache exists, return
@@ -93,8 +94,8 @@ export class SensorsDataController {
       req.user.sub,
       deviceId,
       topic,
-      devicesDataPeriodicDto.from,
-      devicesDataPeriodicDto.to,
+      queryDevicesDataPeriodicDto.from,
+      queryDevicesDataPeriodicDto.to,
     );
     await this.cacheManager.set(cacheKey, result);
 
