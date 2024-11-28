@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   Inject,
   Query,
+  ParseBoolPipe,
 } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
@@ -54,9 +55,11 @@ export class SensorsDataController {
     @Request() req,
     @Param('deviceId', ParseIntPipe) deviceId: number,
     @Param('topic') topic: string,
+    @Query('unix', new ParseBoolPipe({ optional: true }))
+    unix?: boolean,
   ) {
     // Get from cache
-    const cacheKey = `${GET_LATEST_DATA_CACHE_PREFIX}/${deviceId}/${topic}`;
+    const cacheKey = `${GET_LATEST_DATA_CACHE_PREFIX}/${deviceId}/${topic}/${unix ? unix : false}`;
     const cachedValue = await this.cacheManager.get(cacheKey);
 
     // If cache exists, return
@@ -67,6 +70,7 @@ export class SensorsDataController {
       req.user.sub,
       deviceId,
       topic,
+      unix,
     );
     await this.cacheManager.set(cacheKey, result);
 
@@ -83,7 +87,8 @@ export class SensorsDataController {
     @Param('topic') topic: string,
   ) {
     // Get from cache
-    const cacheKey = `${GET_PERIODIC_DATA_CACHE_PREFIX}/${deviceId}/${topic}/${queryDevicesDataPeriodicDto.from}/${queryDevicesDataPeriodicDto.to}`;
+    const { from, to, unix } = queryDevicesDataPeriodicDto;
+    const cacheKey = `${GET_PERIODIC_DATA_CACHE_PREFIX}/${deviceId}/${topic}/${from}/${to}/${unix ? unix : false}`;
     const cachedValue = await this.cacheManager.get(cacheKey);
 
     // If cache exists, return
@@ -94,8 +99,9 @@ export class SensorsDataController {
       req.user.sub,
       deviceId,
       topic,
-      queryDevicesDataPeriodicDto.from,
-      queryDevicesDataPeriodicDto.to,
+      from,
+      to,
+      unix, // if true, return timestamp in milliseconds else return timestamp in ISO
     );
     await this.cacheManager.set(cacheKey, result);
 
