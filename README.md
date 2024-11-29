@@ -521,7 +521,7 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 > | name | type | data type | description |
 > |------|------|-----------|-------------|
-> | `unix` | optional | boolean | true if want timestamp body to be in unix timestamp otherwise in iso timestamp (default) |
+> | `unix` | optional | boolean | true if want timestamp (ms) body to be in unix timestamp otherwise in iso timestamp (default) |
 
 ##### Body
 
@@ -577,14 +577,14 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 > | name | type | data type | description |
 > |------|------|-----------|-------------|
-> | `unix` | optional | boolean | true if want timestamp body to be in unix timestamp otherwise in iso timestamp (default) |
+> | `unix` | optional | boolean | true if want timestamp body to be in unix timestamp (ms) otherwise in iso timestamp (default) |
+> | `from` | required | ISO String Datetime or Unix Timestamp (ms) | datetime indicating the starting point of requested data |
+> | `to`   | required | ISO String Datetime or Unix Timestamp (ms) |  datetime indicating the end of requested data |
 
 ##### Body
 
-> | name | type | data type | description |
-> |------|------|-----------|-------------|
-> | from | required | ISO String Datetime | datetime indicating the starting point of requested data |
-> | to   | required | ISO String Datetime |  datetime indicating the end of requested data |
+> None
+
 
 
 ##### Responses
@@ -601,13 +601,9 @@ docker build -t simple-iot-api-gateway:{tag} .
 ##### Example cURL
 
 > ```javascript
-> curl --location 'http://localhost:3000/devices/1/temp/periodic' \
+> curl --location 'http://localhost:3000/devices/1/temp/periodic?from=2024-10-18T11:03:28.273Z&to=2024-10-18T11:05:28.273Z' \
 > --header 'Authorization: Bearer {{JWT_TOKEN}}' \
-> --header 'Content-Type: application/json' \
-> --data '{
->    "from": "2024-10-18T11:03:28.273Z",
->    "to": "2024-10-18T11:05:28.273Z"
->}'
+> --header 'Content-Type: application/json'
 > ```
 
 #### Example Response
