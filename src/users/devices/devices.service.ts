@@ -40,6 +40,16 @@ export class DevicesService {
     );
   }
 
+  async getDeviceDetails(userId: number, deviceId: number): Promise<any> {
+    const pattern = { cmd: 'devices.details' };
+    const payload = { userId, deviceId };
+    return firstValueFrom(
+      this.client
+        .send(pattern, payload)
+        .pipe(catchError((err) => throwError(() => new RpcException(err)))),
+    );
+  }
+
   async addDeviceTopics(
     userId: number,
     deviceId: number,
