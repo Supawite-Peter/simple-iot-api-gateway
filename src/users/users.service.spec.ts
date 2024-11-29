@@ -76,4 +76,27 @@ describe('UsersService', () => {
       await expect(service.unregister(userId, password)).rejects.toThrow(error);
     });
   });
+
+  describe('getUserDetails', () => {
+    it('should send get user details command to user service', async () => {
+      // Arrange
+      const userId = 1;
+
+      // Act & Assert
+      expect(await service.getUserDetails(userId)).toEqual({
+        pattern: { cmd: 'users.details' },
+        payload: { userId },
+      });
+    });
+
+    it('should throw an error if user service throws an error', async () => {
+      // Arrange
+      const userId = 1;
+      const error = new RpcException('User service error');
+      userClientMock.error = error;
+
+      // Act & Assert
+      await expect(service.getUserDetails(userId)).rejects.toThrow(error);
+    });
+  });
 });
