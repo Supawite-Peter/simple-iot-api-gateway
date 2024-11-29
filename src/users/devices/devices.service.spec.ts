@@ -104,6 +104,33 @@ describe('DevicesService', () => {
     });
   });
 
+  describe('getDeviceDetails', () => {
+    it('should send get device details command to user service', async () => {
+      // Arrange
+      const userId = 1;
+      const deviceId = 1;
+
+      // Act & Assert
+      expect(await service.getDeviceDetails(userId, deviceId)).toEqual({
+        pattern: { cmd: 'devices.details' },
+        payload: { userId, deviceId },
+      });
+    });
+
+    it('should throw an error if user service throws an error', async () => {
+      // Arrange
+      const userId = 1;
+      const deviceId = 1;
+      const error = new RpcException('User service error');
+      userClientMock.error = error;
+
+      // Act & Assert
+      await expect(service.getDeviceDetails(userId, deviceId)).rejects.toThrow(
+        error,
+      );
+    });
+  });
+
   describe('addDeviceTopics', () => {
     it('should send add device topics command to user service', async () => {
       // Arrange

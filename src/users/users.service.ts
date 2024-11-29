@@ -24,4 +24,14 @@ export class UsersService {
         .pipe(catchError((err) => throwError(() => new RpcException(err)))),
     );
   }
+
+  async getUserDetails(userId: number): Promise<any> {
+    const pattern = { cmd: 'users.details' };
+    const payload = { userId };
+    return firstValueFrom(
+      this.client
+        .send(pattern, payload)
+        .pipe(catchError((err) => throwError(() => new RpcException(err)))),
+    );
+  }
 }

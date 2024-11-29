@@ -4,7 +4,10 @@ import { DevicesService } from './devices.service';
 import { DevicesServiceMock } from './mocks/devices.service.mock';
 import { CacheMock } from '../../mocks/cache.mock';
 import { Cache } from 'cache-manager';
-import { GET_DEVICES_LIST_CACHE_PREFIX } from './caches/cache.prefix';
+import {
+  GET_DEVICES_LIST_CACHE_PREFIX,
+  GET_DEVICE_DETAILS_CACHE_PREFIX,
+} from './caches/cache.prefix';
 
 describe('DevicesController', () => {
   let controller: DevicesController;
@@ -59,11 +62,11 @@ describe('DevicesController', () => {
       expect(service.register).toHaveBeenCalledTimes(1);
     });
 
-    it('should refresh cache for get devices list', async () => {
+    it('should refresh cache for get device list/details', async () => {
       // Arrage
       const userId = 1;
-      const cacheKey = `${GET_DEVICES_LIST_CACHE_PREFIX}/${userId}`;
-      cacheMock.set(cacheKey, 'Devices list from cache');
+      const cacheKey1 = `${GET_DEVICES_LIST_CACHE_PREFIX}/${userId}`;
+      cacheMock.set(cacheKey1, 'Devices list from cache');
 
       // Act & Assert
       expect(
@@ -81,7 +84,7 @@ describe('DevicesController', () => {
         ),
       ).toEqual('register Received');
       expect(service.register).toHaveBeenCalledTimes(1);
-      expect(await cacheMock.get(cacheKey)).toEqual(undefined);
+      expect(await cacheMock.get(cacheKey1)).toEqual(undefined);
     });
   });
 
@@ -102,11 +105,14 @@ describe('DevicesController', () => {
       expect(service.unregister).toHaveBeenCalledTimes(1);
     });
 
-    it('should refresh cache for get devices list', async () => {
+    it('should refresh cache for get device list/details', async () => {
       // Arrage
       const userId = 1;
-      const cacheKey = `${GET_DEVICES_LIST_CACHE_PREFIX}/${userId}`;
-      cacheMock.set(cacheKey, 'Devices list from cache');
+      const deviceId = 1;
+      const cacheKey1 = `${GET_DEVICES_LIST_CACHE_PREFIX}/${userId}`;
+      const cacheKey2 = `${GET_DEVICE_DETAILS_CACHE_PREFIX}/${userId}/${deviceId}`;
+      cacheMock.set(cacheKey1, 'Devices list from cache');
+      cacheMock.set(cacheKey2, 'Device details from cache');
 
       // Act & Assert
       expect(
@@ -117,11 +123,12 @@ describe('DevicesController', () => {
               sub: userId,
             },
           },
-          1,
+          deviceId,
         ),
       ).toEqual('unregister Received');
       expect(service.unregister).toHaveBeenCalledTimes(1);
-      expect(await cacheMock.get(cacheKey)).toEqual(undefined);
+      expect(await cacheMock.get(cacheKey1)).toEqual(undefined);
+      expect(await cacheMock.get(cacheKey2)).toEqual(undefined);
     });
   });
 
@@ -158,6 +165,46 @@ describe('DevicesController', () => {
     });
   });
 
+  describe('[GET] /devices/:deviceId', () => {
+    it('should send data to service.getDeviceDetails', async () => {
+      // Act & Assert
+      expect(
+        await controller.getDeviceDetails(
+          {
+            user: {
+              username: 'user1',
+              sub: 1,
+            },
+          },
+          1,
+        ),
+      ).toEqual('getDeviceDetails Received');
+      expect(service.getDeviceDetails).toHaveBeenCalledTimes(1);
+    });
+
+    it('should get device details from cache if exists', async () => {
+      // Arrage
+      const userId = 1;
+      const deviceId = 1;
+      const cacheKey = `${GET_DEVICE_DETAILS_CACHE_PREFIX}/${userId}/${deviceId}`;
+      cacheMock.set(cacheKey, 'Device details from cache');
+
+      // Act & Assert
+      expect(
+        await controller.getDeviceDetails(
+          {
+            user: {
+              username: 'user1',
+              sub: userId,
+            },
+          },
+          1,
+        ),
+      ).toEqual('Device details from cache');
+      expect(service.getDeviceDetails).toHaveBeenCalledTimes(0);
+    });
+  });
+
   describe('[POST] /devices/:deviceId/topics', () => {
     it('should send data to service.addDeviceTopics', async () => {
       // Act & Assert
@@ -176,11 +223,14 @@ describe('DevicesController', () => {
       expect(service.addDeviceTopics).toHaveBeenCalledTimes(1);
     });
 
-    it('should refresh cache for get devices list', async () => {
+    it('should refresh cache for get device list/details', async () => {
       // Arrage
       const userId = 1;
-      const cacheKey = `${GET_DEVICES_LIST_CACHE_PREFIX}/${userId}`;
-      cacheMock.set(cacheKey, 'Devices list from cache');
+      const deviceId = 1;
+      const cacheKey1 = `${GET_DEVICES_LIST_CACHE_PREFIX}/${userId}`;
+      const cacheKey2 = `${GET_DEVICE_DETAILS_CACHE_PREFIX}/${userId}/${deviceId}`;
+      cacheMock.set(cacheKey1, 'Devices list from cache');
+      cacheMock.set(cacheKey2, 'Device details from cache');
 
       // Act & Assert
       expect(
@@ -192,11 +242,12 @@ describe('DevicesController', () => {
             },
           },
           ['topic1'],
-          1,
+          deviceId,
         ),
       ).toEqual('addDeviceTopics Received');
       expect(service.addDeviceTopics).toHaveBeenCalledTimes(1);
-      expect(await cacheMock.get(cacheKey)).toEqual(undefined);
+      expect(await cacheMock.get(cacheKey1)).toEqual(undefined);
+      expect(await cacheMock.get(cacheKey2)).toEqual(undefined);
     });
   });
 
@@ -218,11 +269,14 @@ describe('DevicesController', () => {
       expect(service.removeDeviceTopics).toHaveBeenCalledTimes(1);
     });
 
-    it('should refresh cache for get devices list', async () => {
+    it('should refresh cache for get device list/details', async () => {
       // Arrage
       const userId = 1;
-      const cacheKey = `${GET_DEVICES_LIST_CACHE_PREFIX}/${userId}`;
-      cacheMock.set(cacheKey, 'Devices list from cache');
+      const deviceId = 1;
+      const cacheKey1 = `${GET_DEVICES_LIST_CACHE_PREFIX}/${userId}`;
+      const cacheKey2 = `${GET_DEVICE_DETAILS_CACHE_PREFIX}/${userId}/${deviceId}`;
+      cacheMock.set(cacheKey1, 'Devices list from cache');
+      cacheMock.set(cacheKey2, 'Device details from cache');
 
       // Act & Assert
       expect(
@@ -234,11 +288,12 @@ describe('DevicesController', () => {
             },
           },
           ['topic1'],
-          1,
+          deviceId,
         ),
       ).toEqual('removeDeviceTopics Received');
       expect(service.removeDeviceTopics).toHaveBeenCalledTimes(1);
-      expect(await cacheMock.get(cacheKey)).toEqual(undefined);
+      expect(await cacheMock.get(cacheKey1)).toEqual(undefined);
+      expect(await cacheMock.get(cacheKey2)).toEqual(undefined);
     });
   });
 });
