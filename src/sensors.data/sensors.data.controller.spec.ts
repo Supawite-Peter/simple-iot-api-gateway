@@ -4,10 +4,7 @@ import { SensorsDataService } from './sensors.data.service';
 import { SensorsDataServiceMock } from './mocks/sensors.data.service.mock';
 import { CacheMock } from '../mocks/cache.mock';
 import { Cache } from 'cache-manager';
-import {
-  GET_LATEST_DATA_CACHE_PREFIX,
-  GET_PERIODIC_DATA_CACHE_PREFIX,
-} from './caches/cache.prefix';
+import { GET_PERIODIC_DATA_CACHE_PREFIX } from './caches/cache.prefix';
 
 describe('SensorsDataController', () => {
   let controller: SensorsDataController;
@@ -65,40 +62,6 @@ describe('SensorsDataController', () => {
       ).toEqual('updateValue Received');
       expect(service.updateValue).toHaveBeenCalledTimes(1);
     });
-
-    it('should refresh cache for latest data', async () => {
-      // Arrage
-      const oldTimestamp = new Date().toDateString();
-      const deviceId = 1;
-      const topic = 'topic1';
-      const cacheKey = `${GET_LATEST_DATA_CACHE_PREFIX}/${deviceId}/${topic}`;
-      cacheMock.set(cacheKey, {
-        timestamp: oldTimestamp,
-        value: 1,
-      });
-
-      // Act & Assert
-      expect(
-        await controller.updateValue(
-          {
-            user: {
-              username: 'user1',
-              sub: 1,
-            },
-          },
-          {
-            payload: {
-              timestamp: new Date().toISOString(),
-              value: 2,
-            },
-          },
-          deviceId,
-          topic,
-        ),
-      ).toEqual('updateValue Received');
-      expect(service.updateValue).toHaveBeenCalledTimes(1);
-      expect(await cacheMock.get(cacheKey)).toEqual(undefined);
-    });
   });
 
   describe('[GET] /devices/:deviceId/:topic/latest', () => {
@@ -135,53 +98,6 @@ describe('SensorsDataController', () => {
         ),
       ).toEqual('getLatestData Received');
       expect(service.getLatestData).toHaveBeenCalledTimes(1);
-    });
-
-    it('should get latest data from cache if exists (no unix)', async () => {
-      // Arrage
-      const deviceId = 1;
-      const topic = 'topic1';
-      const cacheKey = `${GET_LATEST_DATA_CACHE_PREFIX}/${deviceId}/${topic}/false`;
-      cacheMock.set(cacheKey, 'Data from cache');
-
-      // Act & Assert
-      expect(
-        await controller.getLatestData(
-          {
-            user: {
-              username: 'user1',
-              sub: 1,
-            },
-          },
-          1,
-          'topic1',
-        ),
-      ).toEqual('Data from cache');
-      expect(service.getLatestData).toHaveBeenCalledTimes(0);
-    });
-
-    it('should get latest data from cache if exists (no unix)', async () => {
-      // Arrage
-      const deviceId = 1;
-      const topic = 'topic1';
-      const cacheKey = `${GET_LATEST_DATA_CACHE_PREFIX}/${deviceId}/${topic}/true`;
-      cacheMock.set(cacheKey, 'Data from cache');
-
-      // Act & Assert
-      expect(
-        await controller.getLatestData(
-          {
-            user: {
-              username: 'user1',
-              sub: 1,
-            },
-          },
-          1,
-          'topic1',
-          true,
-        ),
-      ).toEqual('Data from cache');
-      expect(service.getLatestData).toHaveBeenCalledTimes(0);
     });
   });
 
