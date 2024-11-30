@@ -1,4 +1,14 @@
-import { Post, Delete, Body, Request, Controller, Get } from '@nestjs/common';
+import {
+  Post,
+  Delete,
+  Body,
+  Request,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Public } from '../auth/auth.public';
 import { UsersService } from './users.service';
 import { RegisterDto, registerSchema } from './dto/register.dto';
@@ -29,7 +39,13 @@ export class UsersController {
   }
 
   @Get(':userId')
-  getUserDetails(@Request() req) {
-    return this.usersService.getUserDetails(req.user.sub);
+  getUserDetails(
+    @Request() req,
+    @Param('userId', ParseIntPipe) userId: number,
+  ) {
+    // Only allow user to get their own details
+    return req.user.sub === userId
+      ? this.usersService.getUserDetails(req.user.sub)
+      : new UnauthorizedException();
   }
 }
