@@ -8,7 +8,8 @@ A api gateway for simple iot backend project.
 
 - :white_check_mark: Dockerize
 - :white_check_mark: Cache
-- :black_square_button: JWT Cookie
+- :white_check_mark: JWT Access & Refresh Token
+- :white_check_mark: JWT Cookie
 - :black_square_button: Swagger UI Page
 - :black_square_button: e2e Test
 
@@ -106,9 +107,9 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 ##### Authentication
 
-> | header | type | description |      
+> | cookie key | type | description |      
 > |--------|------|-------------|
-> | `Authorization` | Bearer {{JWT_TOKEN}} | Get from /auth/login |
+> | `accessToken` | string | a JWT Token Set from `/auth/login` or `/auth/refresh` |
 
 
 ##### Parameters
@@ -135,7 +136,7 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 > ```javascript
 > curl --location --request DELETE 'http://localhost:3000/users' \
-> --header 'Authorization: Bearer {{JWT_TOKEN}}' \
+> --header 'Cookie: accessToken={{JWT_TOKEN}}' \
 > --header 'Content-Type: application/json' \
 > --data '{
 >    "password": "world"
@@ -151,9 +152,9 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 ##### Authentication
 
-> | header | type | description |      
+> | cookie key | type | description |      
 > |--------|------|-------------|
-> | `Authorization` | Bearer {{JWT_TOKEN}} | Get from /auth/login |
+> | `accessToken` | string | a JWT Token Set from `/auth/login` or `/auth/refresh` |
 
 
 ##### Parameters
@@ -180,7 +181,7 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 > ```javascript
 > curl --location --request DELETE 'http://localhost:3000/users/1' \
-> --header 'Authorization: Bearer {{JWT_TOKEN}}' \
+> --header 'Cookie: accessToken={{JWT_TOKEN}}' \
 > --header 'Content-Type: application/json'
 > ```
 
@@ -193,7 +194,7 @@ docker build -t simple-iot-api-gateway:{tag} .
 #### Login
 
 <details>
- <summary><code>POST</code> <code><b>/auth/login</b></code> <code>(Login and get JWT Token)</code></summary>
+ <summary><code>POST</code> <code><b>/auth/login</b></code> <code>(Login and set access token and refresh token cookies)</code></summary>
 
 ##### Authentication
 
@@ -215,7 +216,7 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 > | http code | content-type | response |
 > |-----------|--------------|----------|
-> | `200` | `application/json` | `{"accessToken": {{JWT_TOKEN}}}` |
+> | `200` | `application/json` | `None` |
 > | `400` | `application/json` | `{"message": "Validation failed","statusCode": 400}` |
 > | `401` | `application/json` | `{"message": "Incorrect password","statusCode": 401}` |
 > | `404` | `application/json` | `{"message": "User doesn't exist","statusCode": 404}` |
@@ -233,6 +234,43 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 </details>
 
+#### Refresh new access token
+
+<details>
+ <summary><code>GET</code> <code><b>/auth/refresh</b></code> <code>(set new access token cookie)</code></summary>
+
+##### Authentication
+
+> | cookie key | type | description |      
+> |--------|------|-------------|
+> | `refreshToken` | string | a Refresh JWT Token Set from `/auth/login` |
+
+##### Parameters
+
+> None
+
+##### Body
+
+> None
+
+##### Responses
+
+> | http code | content-type | response |
+> |-----------|--------------|----------|
+> | `200` | `application/json` | `None` |
+> | `400` | `application/json` | `{"message": "Validation failed","statusCode": 400}` |
+> | `401` | `application/json` | `{"message": "Unauthorized", "statusCode": 401}` |
+
+##### Example cURL
+
+> ```javascript
+> curl --location 'http://localhost:3000/auth/login' \
+> --header 'Cookie: refreshToken={{JWT_TOKEN}}' \
+> --header 'Content-Type: application/json'
+> ```
+
+</details>
+
 ------------------------------------------------------
 
 ### Devices
@@ -244,9 +282,9 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 ##### Authentication
 
-> | header | type | description |      
+> | cookie key | type | description |      
 > |--------|------|-------------|
-> | `Authorization` | Bearer {{JWT_TOKEN}} | Get from /auth/login |
+> | `accessToken` | string | a JWT Token Set from `/auth/login` or `/auth/refresh` |
 
 ##### Parameters
 
@@ -273,7 +311,7 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 > ```javascript
 > curl --location 'http://localhost:3000/devices' \
-> --header 'Authorization: Bearer {{JWT_TOKEN}}' \
+> --header 'Cookie: accessToken={{JWT_TOKEN}}' \
 > --header 'Content-Type: application/json' \
 > --data '{
 >    "name": "device1",
@@ -288,9 +326,9 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 ##### Authentication
 
-> | header | type | description |      
+> | cookie key | type | description |      
 > |--------|------|-------------|
-> | `Authorization` | Bearer {{JWT_TOKEN}} | Get from /auth/login
+> | `accessToken` | string | a JWT Token Set from `/auth/login` or `/auth/refresh` |
 
 
 ##### Parameters
@@ -318,7 +356,7 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 > ```javascript
 > curl --location --request DELETE 'http://localhost:3000/devices' \
-> --header 'Authorization: Bearer {{JWT_TOKEN}}' \
+> --header 'Cookie: accessToken={{JWT_TOKEN}}' \
 > --header 'Content-Type: application/json' \
 > --data '{
 >    "id": "1"
@@ -334,9 +372,9 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 ##### Authentication
 
-> | header | type | description |      
+> | cookie key | type | description |      
 > |--------|------|-------------|
-> | `Authorization` | Bearer {{JWT_TOKEN}} | Get from /auth/login |
+> | `accessToken` | string | a JWT Token Set from `/auth/login` or `/auth/refresh` |
 
 
 ##### Parameters
@@ -364,7 +402,7 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 > ```javascript
 > curl --location --request DELETE 'http://localhost:3000/devices/1' \
-> --header 'Authorization: Bearer {{JWT_TOKEN}}' \
+> --header 'Cookie: accessToken={{JWT_TOKEN}}' \
 > --header 'Content-Type: application/json'
 > ```
 
@@ -377,9 +415,9 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 ##### Authentication
 
-> | header | type | description |      
+> | cookie key | type | description |      
 > |--------|------|-------------|
-> | `Authorization` | Bearer {{JWT_TOKEN}} | Get from /auth/login |
+> | `accessToken` | string | a JWT Token Set from `/auth/login` or `/auth/refresh` |
 
 
 ##### Parameters
@@ -403,7 +441,7 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 > ```javascript
 > curl --location 'http://localhost:3000/devices' \
-> --header 'Authorization: Bearer {{JWT_TOKEN}}'
+> --header 'Cookie: accessToken={{JWT_TOKEN}}'
 > ```
 
 </details>
@@ -417,9 +455,9 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 ##### Authentication
 
-> | header | type | description |      
+> | cookie key | type | description |      
 > |--------|------|-------------|
-> | `Authorization` | Bearer {{JWT_TOKEN}} | Get from /auth/login |
+> | `accessToken` | string | a JWT Token Set from `/auth/login` or `/auth/refresh` |
 
 ##### Parameters
 
@@ -449,7 +487,7 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 > ```javascript
 > curl --location 'http://localhost:3000/devices/1/topics' \
-> --header 'Authorization: Bearer {{JWT_TOKEN}}' \
+> --header 'Cookie: accessToken={{JWT_TOKEN}}' \
 > --header 'Content-Type: application/json' \
 > --data '{
 >    "topics": "air"
@@ -463,9 +501,9 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 ##### Authentication
 
-> | header | type | description |      
+> | cookie key | type | description |      
 > |--------|------|-------------|
-> | `Authorization` | Bearer {{JWT_TOKEN}} | Get from /auth/login |
+> | `accessToken` | string | a JWT Token Set from `/auth/login` or `/auth/refresh` |
 
 
 ##### Parameters
@@ -496,7 +534,7 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 > ```javascript
 > curl --location --request DELETE 'http://localhost:3000/devices/1/topics' \
-> --header 'Authorization: Bearer {{JWT_TOKEN}}' \
+> --header 'Cookie: accessToken={{JWT_TOKEN}}' \
 > --header 'Content-Type: application/json' \
 > --data '{
 >    "topics": "air"
@@ -514,9 +552,9 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 ##### Authentication
 
-> | header | type | description |      
+> | cookie key | type | description |      
 > |--------|------|-------------|
-> | `Authorization` | Bearer {{JWT_TOKEN}} | Get from /auth/login |
+> | `accessToken` | string | a JWT Token Set from `/auth/login` or `/auth/refresh` |
 
 ##### Parameters
 
@@ -547,7 +585,7 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 > ```javascript
 > curl --location 'http://localhost:3000/devices/1/temp' \
-> --header 'Authorization: Bearer {{JWT_TOKEN}}' \
+> --header 'Cookie: accessToken={{JWT_TOKEN}}' \
 > --header 'Content-Type: application/json' \
 > --data '{
 >   "payload": [
@@ -588,9 +626,9 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 ##### Authentication
 
-> | header | type | description |      
+> | cookie key | type | description |      
 > |--------|------|-------------|
-> | `Authorization` | Bearer {{JWT_TOKEN}} | Get from /auth/login |
+> | `accessToken` | string | a JWT Token Set from `/auth/login` or `/auth/refresh` |
 
 ##### Parameters
 
@@ -625,7 +663,7 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 > ```javascript
 > curl --location 'http://localhost:3000/devices/1/temp/latest' \
-> --header 'Authorization: Bearer {{JWT_TOKEN}}'
+> --header 'Cookie: accessToken={{JWT_TOKEN}}'
 > ```
 
 #### Example Response
@@ -644,9 +682,9 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 ##### Authentication
 
-> | header | type | description |      
+> | cookie key | type | description |      
 > |--------|------|-------------|
-> | `Authorization` | Bearer {{JWT_TOKEN}} | Get from /auth/login |
+> | `accessToken` | string | a JWT Token Set from `/auth/login` or `/auth/refresh` |
 
 ##### Parameters
 
@@ -684,7 +722,7 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 > ```javascript
 > curl --location 'http://localhost:3000/devices/1/temp/periodic?from=2024-10-18T11:03:28.273Z&to=2024-10-18T11:05:28.273Z' \
-> --header 'Authorization: Bearer {{JWT_TOKEN}}' \
+> --header 'Cookie: accessToken={{JWT_TOKEN}}' \
 > --header 'Content-Type: application/json'
 > ```
 

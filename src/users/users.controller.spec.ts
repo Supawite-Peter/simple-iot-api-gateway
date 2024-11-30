@@ -65,12 +65,15 @@ describe('UsersController', () => {
     it('should send userId to service.getUserDetails', async () => {
       // Act & Assert
       expect(
-        await controller.getUserDetails({
-          user: {
-            username: 'user1',
-            sub: 1,
+        await controller.getUserDetails(
+          {
+            user: {
+              username: 'user1',
+              sub: 1,
+            },
           },
-        }),
+          1,
+        ),
       ).toEqual('getUserDetails Received');
       expect(service.getUserDetails).toHaveBeenCalledTimes(1);
     });
