@@ -78,4 +78,22 @@ describe('UsersController', () => {
       expect(service.getUserDetails).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('[PATCH] /users/mqtt/password', () => {
+    it('should send data to service.updateMqttPassword', async () => {
+      // Act & Assert
+      expect(
+        await controller.updateMqttPassword(
+          {
+            user: {
+              username: 'user1',
+              sub: 1,
+            },
+          },
+          'pass',
+        ),
+      ).toEqual('updateMqttPassword Received');
+      expect(service.updateMqttPassword).toHaveBeenCalledTimes(1);
+    });
+  });
 });
