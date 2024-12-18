@@ -8,6 +8,7 @@ import {
   Param,
   ParseIntPipe,
   UnauthorizedException,
+  Patch,
 } from '@nestjs/common';
 import { Public } from '../auth/auth.public';
 import { UsersService } from './users.service';
@@ -47,5 +48,10 @@ export class UsersController {
     return req.user.sub === userId
       ? this.usersService.getUserDetails(req.user.sub)
       : new UnauthorizedException();
+  }
+
+  @Patch('mqtt/password')
+  updateMqttPassword(@Request() req, @Body('password') password: string) {
+    return this.usersService.updateMqttPassword(req.user.sub, password);
   }
 }

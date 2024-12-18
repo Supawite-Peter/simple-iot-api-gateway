@@ -34,4 +34,14 @@ export class UsersService {
         .pipe(catchError((err) => throwError(() => new RpcException(err)))),
     );
   }
+
+  async updateMqttPassword(userId: number, password: string): Promise<any> {
+    const pattern = { cmd: 'users.mqtt.update.password' };
+    const payload = { userId, password };
+    return firstValueFrom(
+      this.client
+        .send(pattern, payload)
+        .pipe(catchError((err) => throwError(() => new RpcException(err)))),
+    );
+  }
 }
