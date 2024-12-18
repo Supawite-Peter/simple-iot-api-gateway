@@ -145,6 +145,55 @@ docker build -t simple-iot-api-gateway:{tag} .
 
 </details>
 
+#### Update User MQTT Password
+
+<details>
+ <summary><code>PATCH</code> <code><b>/users/mqtt/password</b></code> <code>(Update user mqtt password)</code></summary>
+
+##### Note
+
+By default if mqtt password is not set, base password will be used for mqtt authentication instead.
+
+##### Authentication
+
+> | cookie key | type | description |      
+> |--------|------|-------------|
+> | `accessToken` | string | a JWT Token Set from `/auth/login` or `/auth/refresh` |
+
+##### Parameters
+
+> None
+
+##### Body
+
+> | name | type | data type | description |
+> |------|------|-----------|-------------|
+> | password | required | string | string of mqtt password  |
+
+
+##### Responses
+
+> | http code | content-type | response |
+> |-----------|--------------|----------|
+> | `201` | `application/json` | `{"id": 1 ,"username": hello}` |
+> | `400` | `application/json` | `{"message": "Validation failed","statusCode": 400}` |
+> | `404` | `application/json` | `{"message": "User is not exist", "statusCode": 404}` |
+
+##### Example cURL
+
+> ```javascript
+> curl --request PATCH
+> --location 'http://localhost:3000/users/mqtt/password' \
+> --header 'Cookie: accessToken={{JWT_TOKEN}}' \
+> --header 'Content-Type: application/json' \
+> --data '{
+>    "password": "world"
+> }'
+> ```
+
+</details>
+
+
 #### Get User Detail
 
 <details>
@@ -180,7 +229,7 @@ docker build -t simple-iot-api-gateway:{tag} .
 ##### Example cURL
 
 > ```javascript
-> curl --location --request DELETE 'http://localhost:3000/users/1' \
+> curl --location --request GET 'http://localhost:3000/users/1' \
 > --header 'Cookie: accessToken={{JWT_TOKEN}}' \
 > --header 'Content-Type: application/json'
 > ```

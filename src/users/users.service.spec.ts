@@ -99,4 +99,31 @@ describe('UsersService', () => {
       await expect(service.getUserDetails(userId)).rejects.toThrow(error);
     });
   });
+
+  describe('updateMqttPassword', () => {
+    it('should send update mqtt password command to user service', async () => {
+      // Arrange
+      const userId = 1;
+      const password = 'password';
+
+      // Act & Assert
+      expect(await service.updateMqttPassword(userId, password)).toEqual({
+        pattern: { cmd: 'users.mqtt.update.password' },
+        payload: { userId, password },
+      });
+    });
+
+    it('should throw an error if user service throws an error', async () => {
+      // Arrange
+      const userId = 1;
+      const password = 'password';
+      const error = new RpcException('User service error');
+      userClientMock.error = error;
+
+      // Act & Assert
+      await expect(
+        service.updateMqttPassword(userId, password),
+      ).rejects.toThrow(error);
+    });
+  });
 });
